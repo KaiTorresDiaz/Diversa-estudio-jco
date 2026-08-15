@@ -359,26 +359,31 @@
                 <!-- Formulario de contacto -->
                 <div class="bg-white rounded-3xl p-8 border border-olivo/10 shadow-sm" data-aos="fade-left">
                     <h3 class="font-serif font-bold text-xl text-slate-custom mb-6">Envíanos un mensaje</h3>
-                    <form onsubmit="event.preventDefault(); alert('¡Gracias por contactar a Estudio Jurídico Diversa! Te responderemos a la brevedad.');" class="space-y-4">
+                    <form id="contact-form" action="https://formsubmit.co/ajax/Diversaestudiojuridico@gmail.com" method="POST" class="space-y-4">
+                        <input type="hidden" name="_subject" value="Nueva consulta desde el sitio web - Estudio Jurídico Diversa">
+                        <input type="hidden" name="_template" value="table">
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Nombre completo</label>
-                            <input type="text" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-olivo focus:outline-none text-sm bg-slate-light" placeholder="Ej. Camila Pérez">
+                            <input type="text" name="Nombre" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-olivo focus:outline-none text-sm bg-slate-light" placeholder="Ej. Camila Pérez">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Correo electrónico</label>
-                            <input type="email" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-olivo focus:outline-none text-sm bg-slate-light" placeholder="correo@ejemplo.com">
+                            <input type="email" name="Correo" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-olivo focus:outline-none text-sm bg-slate-light" placeholder="correo@ejemplo.com">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Teléfono / WhatsApp</label>
-                            <input type="tel" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-olivo focus:outline-none text-sm bg-slate-light" placeholder="+56 9 ...">
+                            <input type="tel" name="Teléfono" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-olivo focus:outline-none text-sm bg-slate-light" placeholder="+56 9 ...">
                         </div>
                         <div>
                             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-2">Mensaje o caso</label>
-                            <textarea rows="4" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-olivo focus:outline-none text-sm bg-slate-light" placeholder="Describe brevemente tu situación jurídica..."></textarea>
+                            <textarea rows="4" name="Mensaje" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-olivo focus:outline-none text-sm bg-slate-light" placeholder="Describe brevemente tu situación jurídica..."></textarea>
                         </div>
                         <button type="submit" class="w-full bg-olivo hover:bg-olivo-dark text-white font-medium py-3.5 rounded-xl transition-all shadow-sm">
                             Enviar Consulta
                         </button>
+                        <p id="contact-form-status" class="text-sm text-center hidden"></p>
                     </form>
                 </div>
             </div>
@@ -429,6 +434,41 @@
             link.addEventListener('click', () => {
                 mobileMenu.classList.add('hidden');
             });
+        });
+
+        // Contact form submission (FormSubmit AJAX endpoint)
+        const contactForm = document.getElementById('contact-form');
+        const contactFormStatus = document.getElementById('contact-form-status');
+
+        contactForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const submitButton = contactForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+            contactFormStatus.classList.add('hidden');
+
+            try {
+                const response = await fetch(contactForm.action, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: new FormData(contactForm)
+                });
+
+                if (!response.ok) throw new Error('Request failed');
+
+                contactForm.reset();
+                contactFormStatus.textContent = '¡Gracias por contactar a Estudio Jurídico Diversa! Te responderemos a la brevedad.';
+                contactFormStatus.classList.remove('hidden', 'text-red-600');
+                contactFormStatus.classList.add('text-olivo');
+            } catch (error) {
+                contactFormStatus.textContent = 'No pudimos enviar tu consulta. Por favor intenta nuevamente o escríbenos por WhatsApp.';
+                contactFormStatus.classList.remove('hidden', 'text-olivo');
+                contactFormStatus.classList.add('text-red-600');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar Consulta';
+            }
         });
     </script>
 </body>
